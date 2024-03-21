@@ -231,7 +231,7 @@ def inverse_warp_bldg_by_midaxis(pos_sorted, size_sorted, midaxis, aspect_rto, r
         cur_x = pos_sorted[i, 0]
         insert_pos = get_insert_position(relative_cutoff, cur_x) - 1
         if insert_pos > vector_midaxis.shape[0] - 1:
-            print('\n out of index in vector_midaxis. \n')
+            # print('\n out of index in vector_midaxis. \n')
             corres_midaxis_vector_idx.append(vector_midaxis.shape[0] - 1)
             continue
         corres_midaxis_vector_idx.append(insert_pos)

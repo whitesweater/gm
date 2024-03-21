@@ -7,6 +7,7 @@ import numpy as np
 from matplotlib.patches import Rectangle
 import matplotlib.lines as mlines
 import yaml
+import tqdm
 
 plt.subplots(figsize=(20, 4))
 
@@ -86,7 +87,7 @@ def visual_block_graph(G, filepath, filename, draw_edge=False, draw_nonexist=Fal
     pos = np.array(pos, dtype=np.double)
     size = np.array(size, dtype=np.double)
     edge = np.array(edge, dtype=np.int16)
-    print(pos.shape, len(pos))
+    # print(pos.shape, len(pos))
 
     if len(pos) > 0:
         plt.scatter(pos[:, 0], pos[:, 1], c='red', s=50)
@@ -138,6 +139,9 @@ def read_train_yaml(checkpoint_name, filename="train.yaml"):
 
 
 if __name__ == '__main__':
-    with open('dataset/processed/0.gpickle', 'rb') as f:
-        config = nx.read_gpickle(f)
-        visual_block_graph(config, './', 'lll')
+    result_dir = r'test/test_GlobalMapperGATConv_Max_dim256/latest_reconstruct_osm_cities/result/graph'
+    save_dir = r'test/test_GlobalMapperGATConv_Max_dim256/latest_reconstruct_osm_cities/result/block_img'
+    for file_ in tqdm.tqdm(os.listdir(result_dir)):
+        with open(os.path.join(result_dir, file_), 'rb') as f:
+            data = nx.read_gpickle(f)
+            visual_block_graph(data, save_dir, file_,True)

@@ -75,7 +75,7 @@ def draw_pro_data(pos_xsorted, size_xsorted, file_name):
 if __name__ == '__main__':
 
     # num_diff(raw_dir, processed_dir)
-    #1002  只有一个建筑 好好参考
+    # 1002  只有一个建筑 好好参考
     for file_ in tqdm.tqdm(os.listdir(raw_dir)):
         raw_file = os.path.join(raw_dir, file_)
         prcoessed_file = os.path.join(r'dataset/processed', file_ + '.gpickle', )
@@ -83,53 +83,52 @@ if __name__ == '__main__':
         with open(raw_file, 'rb') as f, open(prcoessed_file, 'rb') as f2:
             data = pickle.load(f)
             G_pro = nx.read_gpickle(f2)
+            # 过滤掉不存在的节点
             G_node = [G_pro.nodes[i] for i in G_pro.nodes if G_pro.nodes[i]['exist'] == 1]
-
+            # 移动到中间
             norm_blk_poly, norm_bldg_poly = move_to_origin_efficient(data[0], data[1])
 
+            # 计算主轴
             norm_blk_poly = norm_blk_poly.simplify(0.7)
             poly_list = list(norm_blk_poly.exterior.coords)[:-1]
             poly_list.reverse()  # 逆时针
-
             poly = sg.Polygon(poly_list)
-
-            # 计算主轴
             skel = sg.skeleton.create_interior_straight_skeleton(poly)
             G, longest_skel = get_polyskeleton_longest_path(skel, poly)
             medaxis = modified_skel_to_medaxis(longest_skel, norm_blk_poly)
-            # 坐标变换
+
+            # 坐标变换， 获得我的理论位置
             pos_xsorted, size_xsorted, xsort_idx, aspect_rto = warp_bldg_by_midaxis(
                 norm_bldg_poly, norm_blk_poly, medaxis
             )
-            print(pos_xsorted, '\n size \n', size_xsorted)
-            print(np.mean(pos_xsorted), np.std(pos_xsorted), np.mean(size_xsorted), np.std(size_xsorted))
 
-            res = inverse_warp_bldg_by_midaxis(pos_sorted=pos_xsorted,
-                                               size_sorted=size_xsorted,
-                                               midaxis=medaxis,
-                                               aspect_rto=aspect_rto)
-
-            # 可视化processed_data
+            # 实际位置
             pos_all = np.array([[i['posx'], i['posy']] for i in G_node])
             size_all = np.array([[i['size_x'], i['size_y']] for i in G_node])
-            print(pos_all, '\n size \n', size_all)
-            print(np.mean(pos_all), np.std(pos_all), np.mean(size_all), np.std(size_all))
 
             res_G = inverse_warp_bldg_by_midaxis(pos_sorted=pos_all,
                                                  size_sorted=size_all,
                                                  midaxis=medaxis,
                                                  aspect_rto=G_pro.graph['aspect_ratio'])
 
+            plt.title("origin data")
             for i in norm_bldg_poly:
                 draw(sg.Polygon(i.exterior.coords[:-1]))
             plt.show()
 
-            for i in res[0]:
-                draw(sg.Polygon(i.exterior.coords[:-1]))
-            plt.show()
-
+            plt.title("inverse data")
             for i in res_G[0]:
                 draw(sg.Polygon(i.exterior.coords[:-1]))
             plt.show()
 
-            print(count_sim, count_diff)
+            print("\n我计算出来的转换后坐标")
+            print(pos_xsorted, '\n size \n', size_xsorted)
+            # print('mean and std position:\n', np.mean(pos_xsorted), np.std(pos_xsorted),
+            #       '\nmean and std size:\n', np.mean(size_xsorted), np.std(size_xsorted))
+            print("\n从结果中读取的转换后坐标")
+            print(pos_all, '\n size \n', size_all)
+            # print(np.mean(pos_all), np.std(pos_all), np.mean(size_all), np.std(size_all))
+            print("\n结果转换为正常坐标系")
+            print(res_G[1])
+            print(res_G[2])
+            print("nmn")

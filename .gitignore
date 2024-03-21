@@ -204,3 +204,4 @@ cython_debug/
 dataset/
 all/
 log/
+*.pkl

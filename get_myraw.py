@@ -13,7 +13,9 @@ if __name__ == '__main__':
     max_all = -1
     the_diff = 0
     res = []
+    index = 0
     for file_ in tqdm.tqdm(os.listdir(raw_dir)):
+        index = index + 1
         raw_file = os.path.join(raw_dir, file_)
         prcoessed_file = os.path.join(processed_dir, file_ + '.gpickle', )
         with open(raw_file, 'rb') as f, open(prcoessed_file, 'rb') as f2:
@@ -37,4 +39,9 @@ if __name__ == '__main__':
             )
             res.append({"pos": pos_xsorted, "size": size_xsorted, "midaxis": medaxis, "aspect_rto": aspect_rto,
                         "x_ids": xsort_idx})
-
+            if (index % 100 == 0):
+                # 保存res为pickle
+                with open('res.pkl', 'wb') as f:
+                    pickle.dump(res, f)
+    with open('res.pkl', 'wb') as f:
+        pickle.dump(res, f)

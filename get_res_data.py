@@ -6,7 +6,7 @@ from example_canonical_transform import *
 from geo_utils import inverse_warp_bldg_by_midaxis
 
 raw_dir = r'dataset/raw_geo'
-processed_dir = r'dataset/processed'
+result_dir = r'test/test_GlobalMapperGATConv_Max_dim256/latest_reconstruct_osm_cities/result/graph'
 
 if __name__ == '__main__':
     min_all = 100000
@@ -14,10 +14,10 @@ if __name__ == '__main__':
     the_diff = 0
     res = []
     idx = 0
-    for file_ in tqdm.tqdm(os.listdir(raw_dir)):
-        raw_file = os.path.join(raw_dir, file_)
-        prcoessed_file = os.path.join(processed_dir, file_ + '.gpickle', )
-        with open(raw_file, 'rb') as f, open(prcoessed_file, 'rb') as f2:
+    for file_ in tqdm.tqdm(os.listdir(result_dir)):
+        raw_file = os.path.join(raw_dir, file_[:-8])
+        result_file = os.path.join(result_dir, file_)
+        with open(raw_file, 'rb') as f, open(result_file, 'rb') as f2:
             data = pickle.load(f)
             G_pro = nx.read_gpickle(f2)
 
